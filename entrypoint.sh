@@ -71,6 +71,8 @@ for mnt in "${PUBLICFOLDER}"; do
     # getting rid of those annoying .DS_Store files created by Mac users...
     veto files = /._*/.DS_Store/
     delete veto files = yes
+    # support extra stream
+    vfs objects = streams_xattr
 EOF
 done
 fi
