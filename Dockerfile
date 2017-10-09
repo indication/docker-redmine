@@ -1,4 +1,4 @@
-FROM babim/alpinebase
+FROM alpine:latest
 
 LABEL Description="Simple and lightweight Samba docker container, based on Alpine Linux." Version="0.1"
 
