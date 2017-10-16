@@ -1,0 +1,18 @@
+version: '3.1'
+services:
+  samba:
+    build: ./samba
+    ports:
+      - "53:53"
+      - "53:53/udp"
+      - "137:137/udp"
+      - "138:138/udp"
+      - "389:389"
+      - "445:445"
+    environment:
+       SAMBA_REALM: samba.dom
+       SAMBA_PASSWORD: Password1!
+       SAMBA_HOST_IP: 10.0.17.3
+       SAMBA_DNS_FORWARDER: 127.0.0.11
+    volumes:
+      - /share
