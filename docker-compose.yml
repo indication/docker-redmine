@@ -2,17 +2,34 @@ version: '3.1'
 services:
   samba:
     build: ./samba
+    container_name: samba_sv
     ports:
       - "53:53"
       - "53:53/udp"
+      - "88:88"
+      - "88:88/udp"
+      - "135:135"
       - "137:137/udp"
       - "138:138/udp"
+      - "139:139"
       - "389:389"
+      - "389:389/udp"
       - "445:445"
+      - "464:464"
+      - "464:464/udp"
+      - "636:636"
+      - "1024:1024"
+      - "3268:3268"
+      - "3269:3269"
+      - "49143:49143"
+      - "49443:49443"
+      - "49543:49543"
     environment:
        SAMBA_REALM: samba.dom
        SAMBA_PASSWORD: Password1!
-       SAMBA_HOST_IP: 10.0.17.3
-       SAMBA_DNS_FORWARDER: 127.0.0.11
+       SAMBA_HOST_IP: 192.168.10.8
+       SAMBA_DNS_FORWARDER: 192.168.10.1
     volumes:
       - /share
+      - /var/lib/samba
+    hostname: samba_sv
