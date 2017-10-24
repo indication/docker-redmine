@@ -27,9 +27,99 @@ services:
     environment:
        SAMBA_REALM: samba.dom
        SAMBA_PASSWORD: Password1!
-       SAMBA_HOST_IP: 192.168.10.8
+       SAMBA_HOST_IP: 192.168.10.17
        SAMBA_DNS_FORWARDER: 192.168.10.1
     volumes:
-      - /share
-      - /var/lib/samba
+      - data-samba:/share
+      - data-meta:/var/lib/samba
     hostname: samba_sv
+  redmine:
+    image: redmine:3.4.2
+    container_name: redmine_sv
+    #ports:
+    #  - "8080:3000"
+    environment:
+      REDMINE_DB_POSTGRES: db
+      REDMINE_DB_PASSWORD: link_redmine
+      REDMINE_DB_USERNAME: redmine
+      REDMINE_DB_DATABASE: redmine
+      RAILS_RELATIVE_URL_ROOT: /redmine
+      #SMTP_USER: address@hoge.com
+      #SMTP_PASS: password
+#    restart: always
+    depends_on:
+      - adminer
+    links:
+      - db
+      - samba
+    volumes:
+      - data-redmine:/usr/src/redmine/files
+      - data-gitbucket:/gitbucket
+      - ./scripts/redmine_config.ru:/usr/src/redmine/config.ru
+  gitbucket:
+    #image: f99aq8ove/gitbucket
+    build: ./gitbucket
+    environment:
+      GITBUCKET_DB_URL: jdbc:postgresql://db/gitbucket
+      GITBUCKET_DB_USER: gitbucket
+      GITBUCKET_DB_PASSWORD: link_gitbucket
+      GITBUCKET_CERT: /var/lib/samba/private/tls/cert.pem
+      JAVA_OPTS: -Xmx1g
+      GITBUCKET_OPTS: --prefix=/gitbucket
+    container_name: gitbucket_sv
+    depends_on:
+      - adminer
+    volumes:
+      - data-gitbucket:/gitbucket
+      - data-meta:/var/lib/samba
+    ports:
+      - "29418:29418"
+      #- "8418:8080"
+    links:
+      - db
+      - samba
+    #command: java -jar /opt/gitbucket.war --prefix=/gitbucket
+  db:
+    image: postgres:9.6-alpine
+    environment:
+      POSTGRES_PASSWORD: example
+      POSTGRES_USER: work
+    container_name: postgresql_sv
+    volumes:
+      - data-db:/var/lib/postgresql/data
+      - ./scripts/postgres_create_db_users.sql:/docker-entrypoint-initdb.d/create_db_users.sql:ro
+#    volumes_from:
+#      - data-database
+  adminer:
+    image: adminer
+    container_name: adminer_sv
+    ports:
+      - "8000:8080"
+    links:
+      - db
+    depends_on:
+      - db
+      - samba
+  nginx:
+    image: nginx:alpine
+    container_name: nignx_sv
+    ports:
+      - "80:80"
+    volumes:
+      - ./scripts/nginx_reverseproxy.conf:/etc/nginx/nginx.conf:ro
+    links:
+      - redmine
+      - gitbucket
+     #for debug
+     #command: [nginx-debug, '-g', 'daemon off;']
+#logging:
+#  driver: "json-file"
+#  options:
+#    max-size: "10m"
+#    max-file: "100"
+volumes:
+  data-meta:
+  data-redmine:
+  data-gitbucket:
+  data-db:
+  data-samba:

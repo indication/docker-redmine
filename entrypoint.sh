@@ -75,9 +75,9 @@ cat <<EOF>> $SHARECONFIG
     log file = /dev/stdout
     # disable printing services
     load printers = no
-    #printing = bsd
-    #printcap name = /dev/null
-    #disable spoolss = yes
+    printing = bsd
+    printcap name = /dev/null
+    disable spoolss = yes
     # getting rid of those annoying .DS_Store files created by Mac users...
     veto files = /._*/.DS_Store/
     delete veto files = yes
@@ -94,6 +94,8 @@ cat <<EOF>> $SHARECONFIG
 [data]
     path = /share/data
     read only = No
+    hide unreadable = yes
+
 EOF
 
 mkdir /share/data
