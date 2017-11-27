@@ -13,7 +13,6 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # volume mappings
-#VOLUME ["/config", "/share"]
 VOLUME ["/share","/var/lib/samba"]
 
 # exposes samba's default ports (137, 138 for nmbd and 139, 445 for smbd)
