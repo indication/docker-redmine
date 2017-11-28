@@ -15,7 +15,7 @@ nodaemon=true
 loglevel=info
 # set some defaults and start samba in foreground (-F), logging to stdout (-S), and using our config (-s path)
 [program:samba]
-command=samba -i --debuglevel=3 -s $SHARECONFIG
+command=samba -i -s $SHARECONFIG
 stdout_logfile=/dev/stdout
 stdout_logfile_maxbytes=0
 stderr_logfile=/dev/stderr
@@ -61,8 +61,8 @@ cat <<EOF>> $SHARECONFIG
     #winbind use default domain = true
     #winbind offline logon = false
     #winbind nss info = rfc2307
-    #winbind enum users = yes
-    #winbind enum groups = yes
+    winbind enum users = yes
+    winbind enum groups = yes
     #rpc server dynamic port range = 59140-59240
     #rpc server port:netlogon = 49143
     #rpc server port:drsuapi  = 49543
@@ -73,6 +73,7 @@ cat <<EOF>> $SHARECONFIG
     #guest account = nobody
     #map to guest = Bad User
     log file = /dev/stdout
+    log level = 1
     # disable printing services
     load printers = no
     printing = bsd
@@ -82,8 +83,17 @@ cat <<EOF>> $SHARECONFIG
     veto files = /._*/.DS_Store/
     delete veto files = yes
     # support extra stream
-    vfs objects = streams_xattr
+    vfs objects = streams_xattr full_audit
+    full_audit:prefix = %u|%I|%m|%S
+    full_audit:success = connect disconnect mkdir rmdir open close rename unlink
+    full_audit:failure = connect opendir mkdir rmdir open unlink rename
+    full_audit:facility = LOCAL7
+    full_audit:priority = NOTICE
     map acl inherit = yes
+    acl map full control = yes
+    #create mask = 0774
+    #force create mode = 0660
+    #directory mask = 0775
     store dos attributes = yes
 [netlogon]
     path = /var/lib/samba/sysvol/$SAMBA_REALM/scripts

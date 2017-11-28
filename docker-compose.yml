@@ -32,6 +32,7 @@ services:
     volumes:
       - data-samba:/share
       - data-meta:/var/lib/samba
+      - /dev/log:/dev/log
     hostname: samba_sv
   redmine:
     image: redmine:3.4.2
