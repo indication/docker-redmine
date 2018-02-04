@@ -21,7 +21,7 @@ if [ "$GITBUCKET_CERT" ]; then
   done
   if [ -f $GITBUCKET_CERT ]; then
     echo Getting ready $GITBUCKET_CERT to $TARGET_TLS_PATH
-    echo yes | keytool -import -trustcacerts -storepass 'changeit' -alias sambacert -file $GITBUCKET_CERT -keystore $TARGET_TLS_PATH
+    echo yes | keytool -import -trustcacerts -storepass 'changeit' -alias sambacert -file $GITBUCKET_CERT -keystore $TARGET_TLS_PATH || echo ignore keytool error
     keytool -list -storepass 'changeit' -keystore $TARGET_TLS_PATH
   fi
 fi
