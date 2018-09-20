@@ -92,10 +92,11 @@ services:
 #    volumes_from:
 #      - data-database
   adminer:
-    image: adminer
+    #image: adminer:fastcgi
+    build: ./adminer
     container_name: adminer_sv
-    ports:
-      - "8000:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: db
     links:
       - db
     depends_on:
@@ -111,6 +112,7 @@ services:
     links:
       - redmine
       - gitbucket
+      - adminer
      #for debug
      #command: [nginx-debug, '-g', 'daemon off;']
 #logging:
