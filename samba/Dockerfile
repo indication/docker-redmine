@@ -3,7 +3,7 @@ FROM alpine:latest
 LABEL Description="Simple and lightweight Samba docker container, based on Alpine Linux." Version="0.1"
 
 # install samba and supervisord and clear the cache afterwards
-RUN apk add --no-cache samba-dc krb5 supervisor
+RUN apk add -U --no-cache samba-dc krb5 supervisor
 
 # create a dir for the config and the share
 RUN mkdir /share
