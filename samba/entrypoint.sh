@@ -83,7 +83,7 @@ cat <<EOF>> $SHARECONFIG
     veto files = /._*/.DS_Store/
     delete veto files = yes
     # support extra stream
-    vfs objects = streams_xattr full_audit
+    vfs objects = acl_xattr streams_xattr full_audit
     full_audit:prefix = %u|%I|%m|%S
     full_audit:success = connect disconnect mkdir rmdir open close rename unlink
     full_audit:failure = connect opendir mkdir rmdir open unlink rename
@@ -91,9 +91,9 @@ cat <<EOF>> $SHARECONFIG
     full_audit:priority = NOTICE
     map acl inherit = yes
     acl map full control = yes
-    #create mask = 0774
-    #force create mode = 0660
-    #directory mask = 0775
+    inherit acls = yes
+    inherit owner = yes
+    inherit permissions = yes
     store dos attributes = yes
 [netlogon]
     path = /var/lib/samba/sysvol/$SAMBA_REALM/scripts
