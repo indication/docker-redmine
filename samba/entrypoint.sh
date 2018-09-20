@@ -30,10 +30,6 @@ echo -e "search ${SAMBA_REALM}\nnameserver 127.0.0.1" > /etc/resolv.conf
 # Require $SAMBA_REALM to be set
 : "${SAMBA_REALM:?SAMBA_REALM needs to be set}"
 
-# If $SAMBA_PASSWORD is not set, generate a password
-SAMBA_PASSWORD=${SAMBA_PASSWORD:-`(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c20; echo) 2>/dev/null`}
-echo "[INFO]Samba password set to: $SAMBA_PASSWORD"
-
 # Populate $SAMBA_OPTIONS
 SAMBA_OPTIONS=${SAMBA_OPTIONS:-}
 
@@ -46,6 +42,12 @@ SAMBA_OPTIONS=${SAMBA_OPTIONS:-}
 
 # set config samba
 if [ ! -f "$SHARECONFIG" ]; then
+
+
+# If $SAMBA_PASSWORD is not set, generate a password
+SAMBA_PASSWORD=${SAMBA_PASSWORD:-`(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c20; echo) 2>/dev/null`}
+echo "[INFO]Samba password set to: $SAMBA_PASSWORD"
+
 cat <<EOF>> $SHARECONFIG
 [global]
     server role = domain controller
