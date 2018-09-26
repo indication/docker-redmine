@@ -2,7 +2,7 @@
 
 #THIS IS EXAMPLE SETUP SCRIPT. YOU NEED TO RUN MANUALLY.
 
-DOCKER_COMPOSE_VER=1.16.1
+DOCKER_COMPOSE_VER=1.22.0
 
 #setup docker-compose
 curl -L https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VER/docker-compose-`uname -s`-`uname -m` > docker-compose_$DOCKER_COMPOSE_VER

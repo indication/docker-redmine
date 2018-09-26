@@ -2,7 +2,8 @@
 
 #THIS IS EXAMPLE SETUP SCRIPT. YOU NEED TO RUN MANUALLY.
 
-DOCKER_PKG=docker-ce-17.09.0.ce-1.el7.centos
+#DOCKER_PKG=docker-ce-17.09.0.ce-1.el7.centos
+DOCKER_PKG=docker-ce
 
 #remove default docker files
 sudo yum remove docker docker-common docker-selinux docker-engine
