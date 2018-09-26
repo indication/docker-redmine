@@ -1,3 +1,4 @@
 FROM adminer:fastcgi
-
-RUN cd /var/www/html && ln -s adminer ..
+USER root
+RUN cd /var/www && mv html adminer && mkdir html && chown adminer:adminer html && mv adminer html/
+USER    adminer
