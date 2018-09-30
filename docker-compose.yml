@@ -54,6 +54,7 @@ services:
     links:
       - db
       - samba
+      - rocketchat
     volumes:
       - data-redmine:/usr/src/redmine/files
       - data-gitbucket:/gitbucket
@@ -99,9 +100,11 @@ services:
       ADMINER_DEFAULT_SERVER: db
     links:
       - db
+      - mongodb
     depends_on:
       - db
       - samba
+      - mongodb
   nginx:
     image: nginx:alpine
     container_name: nignx_sv
@@ -113,8 +116,29 @@ services:
       - redmine
       - gitbucket
       - adminer
+      - rocketchat
      #for debug
      #command: [nginx-debug, '-g', 'daemon off;']
+  mongodb:
+    image: mongo
+    container_name: mongodb_sv
+    #restart: always
+    command: --smallfiles
+    volumes:
+      - data-mongodbdata:/data/db
+      - data-mongodbdump:/data/dump
+  rocketchat:
+    image: rocket.chat:latest
+    container_name: rocketchat_sv
+    depends_on:
+      - mongodb
+    links:
+      - mongodb
+    #restart: always
+    volumes:
+      - data-rocketchat:/app/uploads
+    environment:
+      - ROOT_URL=https://localhost:3000/rocketchat
 #logging:
 #  driver: "json-file"
 #  options:
@@ -126,3 +150,6 @@ volumes:
   data-gitbucket:
   data-db:
   data-samba:
+  data-mongodbdata:
+  data-mongodbdump:
+  data-rocketchat:
