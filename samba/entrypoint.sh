@@ -2,9 +2,6 @@
 # value
 SHARECONFIG=/share/smb.conf
 
-WORKGROUP=${WORKGROUP:-WORKGROUP}
-HOSTNAME=$(hostname -s)
-
 set -x
 
 # set config supervisord
@@ -26,6 +23,13 @@ fi
 # Fix nameserver
 echo -e "search ${SAMBA_REALM}\nnameserver 127.0.0.1" > /etc/resolv.conf
 
+
+# set config samba
+if [ ! -f "$SHARECONFIG" ]; then
+
+WORKGROUP=${WORKGROUP:-WORKGROUP}
+HOSTNAME=$(hostname -s)
+
 #ad setup
 # Require $SAMBA_REALM to be set
 : "${SAMBA_REALM:?SAMBA_REALM needs to be set}"
@@ -39,21 +43,18 @@ SAMBA_OPTIONS=${SAMBA_OPTIONS:-}
 
 [ -n "$SAMBA_HOST_IP" ] && SAMBA_OPTIONS="$SAMBA_OPTIONS --host-ip=$SAMBA_HOST_IP"
 
-
-# set config samba
-if [ ! -f "$SHARECONFIG" ]; then
-
-
 # If $SAMBA_PASSWORD is not set, generate a password
 SAMBA_PASSWORD=${SAMBA_PASSWORD:-`(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c20; echo) 2>/dev/null`}
 echo "[INFO]Samba password set to: $SAMBA_PASSWORD"
 
 cat <<EOF>> $SHARECONFIG
 [global]
-    server role = domain controller
+    server role = active directory domain controller
     realm = $SAMBA_REALM
     passdb backend = samba4
-    #idmap_ldb:use rfc2307 = yes
+    idmap_ldb:use rfc2307 = yes
+    idmap config ${SAMBA_DOMAIN}:unix_nss_info = yes
+    idmap config ${SAMBA_DOMAIN}:unix_primary_group = yes
     
     netbios name = $HOSTNAME
     workgroup = ${SAMBA_REALM%%.*}
@@ -75,7 +76,7 @@ cat <<EOF>> $SHARECONFIG
     #guest account = nobody
     #map to guest = Bad User
     log file = /dev/stdout
-    log level = 1
+    #AFTERPROV log level = 1
     # disable printing services
     load printers = no
     printing = bsd
@@ -85,18 +86,20 @@ cat <<EOF>> $SHARECONFIG
     veto files = /._*/.DS_Store/
     delete veto files = yes
     # support extra stream
-    vfs objects = acl_xattr streams_xattr full_audit
-    full_audit:prefix = %u|%I|%m|%S
-    full_audit:success = connect disconnect mkdir rmdir open close rename unlink
-    full_audit:failure = connect opendir mkdir rmdir open unlink rename
-    full_audit:facility = LOCAL7
-    full_audit:priority = NOTICE
+    vfs objects = streams_xattr
+    #AFTERPROV vfs objects = acl_xattr streams_xattr full_audit
+    #AFTERPROV full_audit:prefix = %u|%I|%m|%S
+    #AFTERPROV full_audit:success = connect disconnect mkdir rmdir open close rename unlink
+    #AFTERPROV full_audit:failure = connect opendir mkdir rmdir open unlink rename
+    #AFTERPROV full_audit:facility = LOCAL7
+    #AFTERPROV full_audit:priority = NOTICE
     map acl inherit = yes
     acl map full control = yes
-    inherit acls = yes
-    inherit owner = yes
-    inherit permissions = yes
+    #inherit acls = yes
+    #inherit owner = yes
+    #inherit permissions = yes
     store dos attributes = yes
+    force unknown acl user = false
 [netlogon]
     path = /var/lib/samba/sysvol/$SAMBA_REALM/scripts
     read only = No
@@ -119,6 +122,7 @@ rm -rf /etc/krb5.conf
 rm -rf /etc/samba/smb.conf
 rm -rf /var/lib/samba/private/*
 rm -rf /var/lib/samba/sysvol/*
+rm -f  /usr/samba/private/tls/*.pem
 samba-tool domain provision \
     --configfile=$SHARECONFIG \
     --use-rfc2307 \
@@ -126,16 +130,25 @@ samba-tool domain provision \
     --adminpass=${SAMBA_PASSWORD} \
     --server-role=dc \
     --dns-backend=SAMBA_INTERNAL \
+    --debuglevel=3 \
     $SAMBA_OPTIONS \
     --option="bind interfaces only"=yes
 
 echo -----------------------------
+sed -e 's/#AFTERPROV |\s*vfs objects = streams_xattr//g' $SHARECONFIG
 cat $SHARECONFIG
+echo -----------------------------
+if [ ! -e /var/lib/samba/private/krb5.conf ] ; then
+  echo Provisioning is FAILED
+  rm $SHARECONFIG
+  exit -1
+fi
+
+
 # show status
 samba-tool domain level show
 fi
 
-rm -f /etc/krb5.conf
-ln -s /var/lib/samba/private/krb5.conf /etc/krb5.conf
+cp /var/lib/samba/private/krb5.conf /etc/krb5.conf
 
 exec "$@"
