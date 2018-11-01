@@ -45,6 +45,15 @@ RUN mkdir -p plugins/redmine_messenger && cd plugins/redmine_messenger \
 	&& tar -xvf redmine_messenger.tar.gz --strip-components=1 \
 	&& rm redmine_messenger.tar.gz
 
+ENV R_GITHUBHOOK_VERSION v2.2.0
+ENV R_GITHUBHOOK_MD5 8ee9683637fd053a3ff9861734f692cc
+RUN mkdir -p plugins/redmine_messenger && cd plugins/redmine_messenger \
+	&& wget -O github_hook.tar.gz "https://github.com/koppen/redmine_github_hook/archive/${R_GITHUBHOOK_VERSION}.tar.gz" \
+	&& echo "$R_GITHUBHOOK_MD5 github_hook.tar.gz" | md5sum -c - \
+	&& tar -xvf github_hook.tar.gz --strip-components=1 \
+	&& rm github_hook.tar.gz
+
+
 USER root
 
 RUN bundle install --without development test && rake -T redmine:plugins:ldap_sync
