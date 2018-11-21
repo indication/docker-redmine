@@ -2,8 +2,12 @@ FROM redmine:3.4.2
 
 USER redmine
 WORKDIR /usr/src/redmine/
-COPY redmine_config.ru /usr/src/redmine/config.ru
+# setup subdirectory
+RUN mv config.ru config.ru.org \
+    && sed -E 's#(run .+)#map ActionController::Base.config.relative_url_root || "/" do\n  \1\nend#' config.ru.org > config.ru
 
+
+# setup plugins
 ENV R_WORKTIME_VERSION 0.3.4
 ENV R_WORKTIME_MD5 3e10961af00fc905da5e9bb7960b13c1
 RUN mkdir -p plugins/redmine_work_time && cd plugins/redmine_work_time \
