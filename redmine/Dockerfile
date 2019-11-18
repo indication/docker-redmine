@@ -26,10 +26,11 @@ RUN mkdir -p plugins/clipboard_image_paste && cd plugins/clipboard_image_paste \
 
 # upstream is not exsisted version
 ENV R_WIKIUNC_VERSION master
-ENV R_WIKIUNC_MD5 61069054d1d3866e0c7afe06bf14747d
+#skip md5check
+#ENV R_WIKIUNC_MD5 61069054d1d3866e0c7afe06bf14747d
+#	&& echo "$R_WIKIUNC_MD5 redmine_wiki_unc.tar.gz" | md5sum -c - \
 RUN mkdir -p plugins/redmine_wiki_unc && cd plugins/redmine_wiki_unc \
 	&& wget -O redmine_wiki_unc.tar.gz "https://github.com/bearmini/redmine_wiki_unc/archive/${R_WIKIUNC_VERSION}.tar.gz" \
-	&& echo "$R_WIKIUNC_MD5 redmine_wiki_unc.tar.gz" | md5sum -c - \
 	&& tar -xvf redmine_wiki_unc.tar.gz --strip-components=1 \
 	&& rm redmine_wiki_unc.tar.gz
 
