@@ -2,13 +2,13 @@ FROM openjdk:jre-alpine
 
 MAINTAINER f99aq8ove <f99aq8ove [at] gmail.com>
 
-ADD https://github.com/gitbucket/gitbucket/releases/download/4.16.0/gitbucket.war /opt/gitbucket.war
-
 RUN apk add --no-cache ttf-dejavu git
 
 COPY gitbucket.sh /opt/gitbucket.sh
 
-RUN ln -s /gitbucket /root/.gitbucket
+RUN set -ex \
+    curl -o /opt/gitbucket.war https://github.com/gitbucket/gitbucket/releases/download/4.32.0/gitbucket.war \
+    ln -s /gitbucket /root/.gitbucket
 
 VOLUME /gitbucket
 
