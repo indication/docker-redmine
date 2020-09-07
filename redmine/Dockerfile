@@ -38,10 +38,10 @@ RUN mkdir -p plugins/redmine_wiki_unc && cd plugins/redmine_wiki_unc \
         && tar -xvf redmine_wiki_unc.tar.gz --strip-components=1 \
         && rm redmine_wiki_unc.tar.gz
 
-ENV R_LDAPSYNC_VERSION 2.1.0
-ENV R_LDAPSYNC_MD5 3854a49d766019ab76dffd7b51dbb149
+ENV R_LDAPSYNC_VERSION master
+ENV R_LDAPSYNC_MD5 e7bbebb822efb92c4b8796bf25234686
 RUN mkdir -p plugins/redmine_ldap_sync && cd plugins/redmine_ldap_sync \
-        && wget -O redmine_ldap_sync.tar.gz "https://github.com/thorin/redmine_ldap_sync/archive/${R_LDAPSYNC_VERSION}.tar.gz" \
+        && wget -O redmine_ldap_sync.tar.gz "https://github.com/Zyndoras/redmine_ldap_sync/archive/${R_LDAPSYNC_VERSION}.tar.gz" \
         && echo "$R_LDAPSYNC_MD5 redmine_ldap_sync.tar.gz" | md5sum -c - \
         && tar -xvf redmine_ldap_sync.tar.gz --strip-components=1 \
         && rm redmine_ldap_sync.tar.gz
